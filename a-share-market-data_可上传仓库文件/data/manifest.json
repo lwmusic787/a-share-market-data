@@ -1,43 +1,43 @@
 {
   "source": "AKShare index_zh_a_hist / public upstream quotes",
   "timezone": "Asia/Shanghai",
-  "retrieved_at": "2026-11-09T22:56:10.061849+08:00",
+  "retrieved_at": "2026-11-10T17:11:03.051159+08:00",
   "status": "success",
   "indices": {
     "sh000001": {
       "name": "上证指数",
       "symbol": "000001",
       "rows": 420,
-      "first_trade_date": "2025-02-18",
-      "last_trade_date": "2026-11-09",
-      "latest_close": 3660.79,
+      "first_trade_date": "2025-02-19",
+      "last_trade_date": "2026-11-10",
+      "latest_close": 3663.72,
       "is_today": true
     },
     "sh000300": {
       "name": "沪深300",
       "symbol": "000300",
       "rows": 420,
-      "first_trade_date": "2025-02-18",
-      "last_trade_date": "2026-11-09",
-      "latest_close": 4056.11,
+      "first_trade_date": "2025-02-19",
+      "last_trade_date": "2026-11-10",
+      "latest_close": 4059.11,
       "is_today": true
     },
     "sz399006": {
       "name": "创业板指",
       "symbol": "399006",
       "rows": 420,
-      "first_trade_date": "2025-02-18",
-      "last_trade_date": "2026-11-09",
-      "latest_close": 2458.56,
+      "first_trade_date": "2025-02-19",
+      "last_trade_date": "2026-11-10",
+      "latest_close": 2494.4,
       "is_today": true
     },
     "sz399001": {
       "name": "深证成指",
       "symbol": "399001",
       "rows": 420,
-      "first_trade_date": "2025-02-18",
-      "last_trade_date": "2026-11-09",
-      "latest_close": 11145.49,
+      "first_trade_date": "2025-02-19",
+      "last_trade_date": "2026-11-10",
+      "latest_close": 11241.54,
       "is_today": true
     }
   }
