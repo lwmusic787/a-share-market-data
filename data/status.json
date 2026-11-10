@@ -1,0 +1,19 @@
+{
+  "run_time_bjt": "2026-11-10T17:29:34.835407+08:00",
+  "source": "AKShare public data endpoints",
+  "success_rows": {
+    "sh000001": 8760,
+    "sh000300": 5306,
+    "sz399006": 3992,
+    "sz399001": 8713,
+    "002916": 690,
+    "002463": 690,
+    "600183": 690,
+    "002371": 690,
+    "300476": 690,
+    "market_spot": 5928
+  },
+  "errors": [],
+  "status": "ok",
+  "note": "Snapshots may be intraday if manually triggered; scheduled run is after A-share close. Validate last row date before using."
+}
