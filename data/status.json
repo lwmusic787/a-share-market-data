@@ -1,19 +1,157 @@
 {
-  "run_time_bjt": "2026-11-11T17:32:45.109618+08:00",
-  "source": "AKShare public data endpoints",
+  "run_time_bjt": "2026-11-14T15:25:46.064535+08:00",
+  "source": "AKShare public endpoints",
+  "status": "partial",
+  "errors": [
+    "sh000001: rate limited: 东方财富 push2 行情服务器断开了连接，通常是短时间内请求过多，当前 IP 被临时限流。首次限流一般约 5 分钟后恢复，反复触发后可能需要 40 分钟以上；等待期间不要重复调用东方财富的行情接口，否则会延长限流。"
+  ],
   "success_rows": {
-    "sh000001": 8761,
-    "sh000300": 5307,
-    "sz399006": 3993,
-    "sz399001": 8714,
-    "002916": 691,
-    "002463": 691,
-    "600183": 691,
-    "002371": 691,
-    "300476": 691,
-    "market_spot": 5928
+    "sh000001": {
+      "rows": 8763,
+      "latest": "2026-11-13"
+    },
+    "sh000300": {
+      "rows": 6030,
+      "latest": "2026-11-13"
+    },
+    "sz399006": {
+      "rows": 3995,
+      "latest": "2026-11-13"
+    },
+    "sz399001": {
+      "rows": 8717,
+      "latest": "2026-11-13"
+    },
+    "market_spot": {
+      "rows": 5578,
+      "date": "2026-11-14"
+    },
+    "000001": {
+      "rows": 693,
+      "latest": "2026-11-13"
+    },
+    "000002": {
+      "rows": 693,
+      "latest": "2026-11-13"
+    },
+    "000006": {
+      "rows": 693,
+      "latest": "2026-11-13"
+    },
+    "000007": {
+      "rows": 692,
+      "latest": "2026-11-13"
+    },
+    "000008": {
+      "rows": 688,
+      "latest": "2026-11-13"
+    },
+    "000009": {
+      "rows": 693,
+      "latest": "2026-11-13"
+    },
+    "000010": {
+      "rows": 692,
+      "latest": "2026-11-13"
+    },
+    "000011": {
+      "rows": 693,
+      "latest": "2026-11-13"
+    },
+    "000012": {
+      "rows": 693,
+      "latest": "2026-11-13"
+    },
+    "000014": {
+      "rows": 693,
+      "latest": "2026-11-13"
+    },
+    "000017": {
+      "rows": 693,
+      "latest": "2026-11-13"
+    },
+    "000019": {
+      "rows": 693,
+      "latest": "2026-11-13"
+    },
+    "000020": {
+      "rows": 693,
+      "latest": "2026-11-13"
+    },
+    "000021": {
+      "rows": 693,
+      "latest": "2026-11-13"
+    },
+    "000025": {
+      "rows": 693,
+      "latest": "2026-11-13"
+    },
+    "000026": {
+      "rows": 693,
+      "latest": "2026-11-13"
+    },
+    "000027": {
+      "rows": 693,
+      "latest": "2026-11-13"
+    },
+    "000028": {
+      "rows": 693,
+      "latest": "2026-11-13"
+    },
+    "000029": {
+      "rows": 693,
+      "latest": "2026-11-13"
+    },
+    "000030": {
+      "rows": 693,
+      "latest": "2026-11-13"
+    },
+    "000031": {
+      "rows": 693,
+      "latest": "2026-11-13"
+    },
+    "000032": {
+      "rows": 693,
+      "latest": "2026-11-13"
+    },
+    "000034": {
+      "rows": 693,
+      "latest": "2026-11-13"
+    },
+    "000035": {
+      "rows": 693,
+      "latest": "2026-11-13"
+    },
+    "000036": {
+      "rows": 693,
+      "latest": "2026-11-13"
+    },
+    "002916": {
+      "rows": 693,
+      "latest": "2026-11-13"
+    },
+    "002463": {
+      "rows": 693,
+      "latest": "2026-11-13"
+    },
+    "600183": {
+      "rows": 693,
+      "latest": "2026-11-13"
+    },
+    "002371": {
+      "rows": 693,
+      "latest": "2026-11-13"
+    },
+    "300476": {
+      "rows": 693,
+      "latest": "2026-11-13"
+    }
   },
-  "errors": [],
-  "status": "ok",
-  "note": "Snapshots may be intraday if manually triggered; scheduled run is after A-share close. Validate last row date before using."
+  "coverage": {
+    "universe": 5578,
+    "stocks_with_files": 30,
+    "batch_attempted": 30,
+    "all_stocks_complete": false
+  },
+  "note": "Completeness requires per-symbol trading-calendar/date validation; snapshot is not an official exchange close."
 }
