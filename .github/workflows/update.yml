@@ -3,6 +3,10 @@ on:
   schedule:
     - cron: '40 8 * * 1-5'
   workflow_dispatch:
+  push:
+    paths:
+      - 'scripts/update.py'
+      - '.github/workflows/update.yml'
 permissions:
   contents: write
 concurrency:
@@ -19,13 +23,23 @@ jobs:
           python-version: '3.11'
           cache: pip
       - run: pip install -r requirements.txt
-      - run: python scripts/update.py
-      - name: Commit data
+      - name: Collect market data
+        id: collect
+        continue-on-error: true
+        run: python scripts/update.py
+      - name: Commit data and status even if collection failed
+        if: always()
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add data
           if ! git diff --cached --quiet; then
             git commit -m "data: refresh A-share market data"
-            git push
+            git pull --rebase origin main
+            git push origin HEAD:main
           fi
+      - name: Report collection failure
+        if: steps.collect.outcome == 'failure'
+        run: |
+          echo "Collection failed. Check data/status.json and job logs."
+          exit 1
