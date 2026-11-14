@@ -15,18 +15,28 @@ INDEX = {"sh000001":"上证指数","sh000300":"沪深300","sz399006":"创业板�
 BATCH_SIZE = max(1, int(os.getenv("BACKFILL_BATCH_SIZE", "180")))
 START = os.getenv("BACKFILL_START", "20240101")
 errors, success = [], {}
+rate_limited = False
+
+def is_rate_limit(exc):
+    return "Push2RateLimitError" in str(exc) or "限流" in str(exc)
+
 def attempt(label, fn):
-    for i in range(3):
+    global rate_limited
+    for i in range(2):
         try:
             result = fn()
             if result is None or result.empty:
                 raise ValueError("empty response")
             return result
         except Exception as e:
-            if i == 2:
+            if is_rate_limit(e):
+                rate_limited = True
+                errors.append(f"{label}: rate limited: {e}")
+                return None
+            if i == 1:
                 errors.append(f"{label}: {type(e).__name__}: {e}")
             else:
-                time.sleep(2*(i+1))
+                time.sleep(5*(i+1))
     return None
 
 def save(df, path, datecol):
@@ -41,20 +51,26 @@ def save(df, path, datecol):
     return len(df), (df[datecol].iloc[-1] if len(df) else None)
 
 for code in INDEX:
-    df = attempt(code, lambda c=code: ak.stock_zh_index_daily_em(symbol=c))
+    df = None if rate_limited else attempt(code, lambda c=code: ak.stock_zh_index_daily_em(symbol=c))
+    if df is None:
+        df = attempt(code+"_sina", lambda c=code: ak.stock_zh_index_daily(symbol=c))
     if df is not None:
         col = "date" if "date" in df.columns else "日期"
         count, latest = save(df, ROOT/"indices"/f"{code}.csv", col)
         success[code] = {"rows":count,"latest":latest}
 
-spot = attempt("market_spot", ak.stock_zh_a_spot_em)
+spot = None if rate_limited else attempt("market_spot", ak.stock_zh_a_spot_em)
+if spot is None:
+    spot = attempt("market_spot_sina", ak.stock_zh_a_spot)
 universe_path = ROOT/"universe.csv"
 if spot is not None:
     (ROOT/"snapshots").mkdir(parents=True, exist_ok=True)
     spot.to_csv(ROOT/"snapshots"/f"{TODAY}.csv", index=False, encoding="utf-8-sig")
     success["market_spot"] = {"rows":len(spot),"date":TODAY}
-    codes = spot["代码"].astype(str).str.zfill(6)
-    universe = pd.DataFrame({"code":codes, "name":spot["名称"].astype(str)})
+    code_column = "代码" if "代码" in spot.columns else "code"
+    codes = spot[code_column].astype(str).str.replace(r"^(sh|sz|bj)", "", regex=True).str.zfill(6)
+    names = spot["名称"].astype(str) if "名称" in spot.columns else (spot["name"].astype(str) if "name" in spot.columns else codes)
+    universe = pd.DataFrame({"code":codes, "name":names})
     universe = universe[universe.code.str.fullmatch(r"[0-9]{6}")].drop_duplicates("code").sort_values("code")
     universe.to_csv(universe_path, index=False, encoding="utf-8-sig")
 elif universe_path.exists():
@@ -80,7 +96,12 @@ for code in batch:
                 start = max(START, recent)
         except Exception:
             pass
-    df = attempt(code, lambda c=code,s=start: ak.stock_zh_a_hist(symbol=c,period="daily",start_date=s,end_date=NOW.strftime("%Y%m%d"),adjust="qfq"))
+    df = None if rate_limited else attempt(code, lambda c=code,s=start: ak.stock_zh_a_hist(symbol=c,period="daily",start_date=s,end_date=NOW.strftime("%Y%m%d"),adjust="qfq"))
+    if df is None:
+        prefix = "sh" if code.startswith(("6","9")) else "bj" if code.startswith(("4","8")) else "sz"
+        df = attempt(code+"_sina", lambda p=prefix,c=code,s=start: ak.stock_zh_a_daily(symbol=p+c,start_date=s,end_date=NOW.strftime("%Y%m%d"),adjust="qfq"))
+        if df is not None:
+            df = df.rename(columns={"date":"日期","open":"开盘","high":"最高","low":"最低","close":"收盘","volume":"成交量"})
     if df is not None:
         count, latest = save(df, path, "日期")
         success[code] = {"rows":count,"latest":latest}
@@ -91,4 +112,4 @@ status = {"run_time_bjt":NOW.isoformat(),"source":"AKShare public endpoints","st
 (ROOT/"status.json").write_text(json.dumps(status,ensure_ascii=False,indent=2),encoding="utf-8")
 print(json.dumps(status,ensure_ascii=False,indent=2))
 if not success:
-    raise SystemExit("No data retrieved")
+    raise SystemExit("No data retrieved; existing files preserved")
