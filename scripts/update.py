@@ -12,7 +12,7 @@ NOW = datetime.now(ZoneInfo("Asia/Shanghai"))
 TODAY = NOW.strftime("%Y-%m-%d")
 WATCH = {"002916":"深南电路","002463":"沪电股份","600183":"生益科技","002371":"北方华创","300476":"胜宏科技"}
 INDEX = {"sh000001":"上证指数","sh000300":"沪深300","sz399006":"创业板指","sz399001":"深证成指"}
-BATCH_SIZE = max(1, int(os.getenv("BACKFILL_BATCH_SIZE", "180")))
+BATCH_SIZE = max(1, int(os.getenv("BACKFILL_BATCH_SIZE", "25")))
 START = os.getenv("BACKFILL_START", "20240101")
 errors, success = [], {}
 rate_limited = False
@@ -60,7 +60,7 @@ for code in INDEX:
         success[code] = {"rows":count,"latest":latest}
 
 spot = None if rate_limited else attempt("market_spot", ak.stock_zh_a_spot_em)
-if spot is None:
+if spot is None and hasattr(ak, "stock_zh_a_spot"):
     spot = attempt("market_spot_sina", ak.stock_zh_a_spot)
 universe_path = ROOT/"universe.csv"
 if spot is not None:
@@ -76,7 +76,16 @@ if spot is not None:
 elif universe_path.exists():
     universe = pd.read_csv(universe_path, dtype=str)
 else:
-    universe = pd.DataFrame(columns=["code","name"])
+    historical_snapshots = sorted((ROOT/"snapshots").glob("*.csv")) if (ROOT/"snapshots").exists() else []
+    if historical_snapshots:
+        old_spot = pd.read_csv(historical_snapshots[-1], dtype=str)
+        column = "代码" if "代码" in old_spot.columns else "code"
+        name_column = "名称" if "名称" in old_spot.columns else "name"
+        universe = pd.DataFrame({"code":old_spot[column].astype(str).str.replace(r"^(sh|sz|bj)","",regex=True).str.zfill(6), "name":old_spot[name_column].astype(str)})
+        universe = universe[universe.code.str.fullmatch(r"[0-9]{6}")].drop_duplicates("code")
+        universe.to_csv(universe_path,index=False,encoding="utf-8-sig")
+    else:
+        universe = pd.DataFrame(columns=["code","name"])
 
 codes = sorted(set(universe["code"].astype(str).tolist()) | set(WATCH))
 cursor_file = ROOT/"backfill_cursor.json"
